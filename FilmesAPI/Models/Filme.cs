@@ -22,6 +22,6 @@ public class Filme
     [Required(ErrorMessage = "O Campo ano é obrigatório")]
     public int Ano { get; set; }
 
-    
+    public virtual ICollection<Sessao> Sessoes { get; set; }
 
 }
