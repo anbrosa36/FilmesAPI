@@ -3,6 +3,7 @@ using FilmesAPI.Data;
 using FilmesAPI.Data.DTO;
 using FilmesAPI.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace FilmesAPI.Controllers;
 
@@ -41,9 +42,16 @@ public class CinemasController : Controller
     /// <param name="take">Parametro que determina a quantidade de registros a serem retornados</param>
     /// <returns>IEnumerable de ReadCinemaDTO</returns>
     [HttpGet]
-    public IEnumerable<ReadCinemaDTO> RetornaCinemas()
+    public IEnumerable<ReadCinemaDTO> RetornaCinemas([FromQuery] int? enderecoId = null)
     {
-        return _mapper.Map<List<ReadCinemaDTO>>(_context.Cinemas.ToList());
+        if (enderecoId == null)
+        {
+            return _mapper.Map<List<ReadCinemaDTO>>(_context.Cinemas.ToList());
+        }
+        return _mapper.Map<List<ReadCinemaDTO>>(
+            _context.Cinemas.FromSqlRaw($"Select Id, Nome, EnderecoId From Cimenas" +
+            $"Where Cimenas.EnderecoId={enderecoId}").ToList());
+        
     }
 
     /// <summary>
