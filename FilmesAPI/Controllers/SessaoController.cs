@@ -31,7 +31,8 @@ namespace FilmesAPI.Controllers
             Sessao sessao = _mapper.Map<Sessao>(sessaoDTO);
             _context.Sessoes.Add(sessao);
             _context.SaveChanges();
-            return CreatedAtAction(nameof(RecuperarSessaoPorId), new { Id = sessao.Id }, sessaoDTO);
+            return CreatedAtAction(nameof(RecuperarSessaoPorId)
+                , new { filmeId = sessao.FilmeId, cinemaId = sessao.CinemaId }, sessao);
         }
 
         /// <summary>
@@ -51,10 +52,11 @@ namespace FilmesAPI.Controllers
         /// </summary>
         /// <param name="id">Id do registro da sessao a ser retornado</param>
         /// <returns>IActionResult</returns>
-        [HttpGet("{id}")]
-        public IActionResult RecuperarSessaoPorId(Guid id)
+        [HttpGet("{cinemaId}/{filmeId}")]
+        public IActionResult RecuperarSessaoPorId(int cinemaId,int filmeId )
         {
-            Sessao sessao = _context.Sessoes.FirstOrDefault(s => s.Id.Equals(id));
+            Sessao sessao = _context.Sessoes.FirstOrDefault(
+                sessao => sessao.CinemaId == cinemaId && sessao.FilmeId == filmeId);
 
             if (sessao == null) return NotFound();
             ReadSessaoDTO sessaoDto = _mapper.Map<ReadSessaoDTO>(sessao);

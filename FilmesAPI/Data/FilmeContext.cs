@@ -3,19 +3,37 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FilmesAPI.Data;
 
-public class FilmeContext:DbContext
+public class FilmeContext : DbContext
 {
-	public FilmeContext(DbContextOptions<FilmeContext>opts)
-		:base(opts)
-	{
+    public FilmeContext(DbContextOptions<FilmeContext> opts)
+        : base(opts)
+    {
 
-	}
+    }
 
-	public DbSet<Filme> Filmes { get; set; }
+    protected override void OnModelCreating(ModelBuilder builder)
+    {
+        builder.Entity<Sessao>().HasKey(sessao => new { sessao.FilmeId, sessao.CinemaId });
 
-	public DbSet<Cinema> Cinemas { get; set; }
+        builder.Entity<Sessao>().HasOne(sessao => sessao.Cinema)
+            .WithMany(cinema => cinema.Sessoes)
+            .HasForeignKey(sessao => sessao.CinemaId);
 
-	public DbSet<Endereco> Enderecos { get; set; }
+        builder.Entity<Sessao>().HasOne(sessao => sessao.Filme)
+            .WithMany(filme => filme.Sessoes)
+            .HasForeignKey(sessao => sessao.FilmeId);
 
-    public DbSet<Sessao> Sessoes{ get; set; }
+        builder.Entity<Endereco>()
+            .HasOne(endereco => endereco.Cinema)
+            .WithOne(cinema => cinema.Endereco)
+            .OnDelete(DeleteBehavior.Restrict);
+    }
+
+    public DbSet<Filme> Filmes { get; set; }
+
+    public DbSet<Cinema> Cinemas { get; set; }
+
+    public DbSet<Endereco> Enderecos { get; set; }
+
+    public DbSet<Sessao> Sessoes { get; set; }
 }
